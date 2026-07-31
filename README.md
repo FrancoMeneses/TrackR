@@ -6,7 +6,7 @@ Sistema de tracking de ubicación propio, inspirado en Google Timeline pero con 
 
 ```
 ┌──────────────────┐      HTTP POST      ┌──────────────────┐
-│  iPhone          │ ────────────────────→│  Pi 5 (TrackR)   │
+│  iPhone          │ ────────────────────→│  Server (TrackR)   │
 │  OwnTracks App   │                      │  Flask + SQLite   │
 │                  │                      │  Puerto 5050      │
 └──────────────────┘                      └────────┬─────────┘
