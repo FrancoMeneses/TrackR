@@ -112,7 +112,7 @@ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -node
 ```
 
 ### Instalar en iPhone
-1. Abrir Safari → `https://YOUR_SERVER_IP:5050/static/trackr-cert.pem`
+1. Abrir navegador → `https://YOUR_SERVER_IP:5050/static/trackr-cert.pem`
 2. Ajustes → General → Gestión de dispositivo → Instalar perfil
 3. Ajustes → General → Acerca de → Ajustes de certificados → Activar confianza
 
@@ -277,5 +277,5 @@ sudo systemctl start trackr
 
 ---
 
-**Creado:** 30 julio 2026
+**Creado:** 31 julio 2026
 **Autor:** BeStackDevelopment / subfire
