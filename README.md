@@ -82,7 +82,7 @@ GET /health  # Health check
 ### 3. Configurar servidor
 1. Abrir OwnTracks → Settings (engranaje)
 2. **Connection** → Selection: HTTP
-3. **HTTP** → URL: `http://100.120.238.37:5050/owntracks`
+3. **HTTP** → URL: `http://YOUR_SERVER_IP:5050/owntracks`
 4. **HTTP** → Method: POST
 5. **HTTP** → Content-Type: application/json
 
@@ -108,7 +108,7 @@ GET /health  # Health check
 
 Accede al mapa desde:
 ```
-http://100.120.238.37:5050/
+http://YOUR_SERVER_IP:5050/
 ```
 
 ### Funciones:
@@ -126,13 +126,13 @@ El agente Aserrin puede consultar las rutas via API:
 
 ```bash
 # Ver ubicaciones de hoy
-curl http://100.120.238.37:5050/api/locations/today
+curl http://YOUR_SERVER_IP:5050/api/locations/today
 
 # Ver rutas de un día específico
-curl http://100.120.238.37:5050/api/routes?date=2026-07-30
+curl http://YOUR_SERVER_IP:5050/api/routes?date=2026-07-30
 
 # Guardar resumen de ruta
-curl -X POST http://100.120.238.37:5050/api/route/summary \
+curl -X POST http://YOUR_SERVER_IP:5050/api/route/summary \
   -H "Content-Type: application/json" \
   -d '{
     "device_id": "AB",
