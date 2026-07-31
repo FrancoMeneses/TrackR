@@ -6,7 +6,7 @@ Sistema de tracking de ubicación propio, inspirado en Google Timeline pero con 
 
 ```mermaid
 graph LR
-    A[OwnTracks App (iPhone/Android)<br/>iPhone / Android] -->|HTTP POST| B[Server TrackR<br/>Flask + SQLite<br/>:5050]
+    A[OwnTracks App<br/>iPhone / Android] -->|HTTP POST| B[Server TrackR<br/>Flask + SQLite<br/>:5050]
     B --> C[Dashboard<br/>Leaflet.js Map]
     B --> D[API REST<br/>Consultas]
     B --> E[Stay Detection<br/>Procesamiento]
