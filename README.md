@@ -120,7 +120,7 @@ http://YOUR_SERVER_IP:5050/
 - 📅 Seleccionar fecha específica
 - 📊 Estadísticas en tiempo real
 
-## Uso con Aserrin
+## Uso con agentes
 
 El agente Aserrin puede consultar las rutas via API:
 
