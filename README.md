@@ -121,7 +121,6 @@ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -node
 2. Settings → TLS → Trust untrusted certificates → Activado
 3. URL: `https://YOUR_SERVER_IP:5050/owntracks`
 
-> **Android**: No necesita certificado autofirmado. HTTP funciona directo sin HTTPS.
 
 ## Dashboard
 
