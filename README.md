@@ -170,6 +170,8 @@ trackr/
 
 ## Instalación en server
 
+> **Recomendado:** Raspberry Pi Zero 2W (512MB RAM). Ultraligero: Flask + SQLite + Gunicorn.
+
 ```bash
 cd ~/trackr
 python3 -m venv venv
