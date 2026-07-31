@@ -168,7 +168,7 @@ trackr/
 └── static/             # Assets estáticos
 ```
 
-## Instalación en Pi 5
+## Instalación en server
 
 ```bash
 cd ~/trackr
