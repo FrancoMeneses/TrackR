@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+data/cert.pem
+data/key.pem
+data/trackr.db
+*.db
+.env
+static/trackr-cert.pem

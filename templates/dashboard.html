@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗺️ TrackR</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #1a1a2e; color: #eee; }
+        #header { background: #16213e; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f3460; }
+        #header h1 { font-size: 1.1em; color: #e94560; }
+        #map { height: calc(100vh - 170px); width: 100%; }
+        #moto-bar { background: #16213e; padding: 6px 16px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #0f3460; font-size: 0.85em; }
+        #moto-bar.on { background: #0d2818; border-bottom-color: #4caf50; }
+        #btn-moto { padding: 5px 16px; border-radius: 6px; border: 2px solid; cursor: pointer; font-size: 0.85em; font-weight: bold; }
+        #btn-moto.off { background: transparent; color: #4caf50; border-color: #4caf50; }
+        #btn-moto.on { background: #e94560; color: #fff; border-color: #e94560; }
+        #moto-info { color: #aaa; }
+        #controls { background: #16213e; padding: 8px 16px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; border-top: 2px solid #0f3460; }
+        #controls input[type="date"] { background: #1a1a2e; color: #eee; border: 1px solid #0f3460; padding: 6px 10px; border-radius: 6px; font-size: 0.85em; }
+        #controls button { background: #0f3460; color: #eee; border: 1px solid #e94560; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8em; }
+        #controls button:hover { background: #e94560; }
+        #controls button.active { background: #e94560; }
+        .sep { width: 1px; height: 24px; background: #333; margin: 0 2px; }
+    </style>
+</head>
+<body>
+    <div id="header"><h1>🗺️ TrackR</h1></div>
+    <div id="moto-bar">
+        <button id="btn-moto" class="off" onclick="toggleMoto()">🏍️ Activar Ruta</button>
+        <span id="moto-info">Modo ruta: inactivo</span>
+    </div>
+    <div id="map"></div>
+    <div id="controls">
+        <input type="date" id="dp" onchange="render()">
+        <div class="sep"></div>
+        <button id="b-pts" class="active" onclick="vm='points';setBtn('b-pts');render()">📍 Puntos</button>
+        <button id="b-tl" onclick="vm='timeline';setBtn('b-tl');render()">🗺️ Timeline</button>
+        <div class="sep"></div>
+        <button id="b-per" class="active" onclick="tog('personal',this)">🔴 Personal</button>
+        <button id="b-rut" onclick="tog('ruta',this)">🟢 Ruta</button>
+        <div class="sep"></div>
+        <button onclick="refresh()">🔄</button>
+    </div>
+    <script>
+        const map = L.map('map').setView([19.05, -98.17], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OSM',maxZoom:19}).addTo(map);
+        let markers=[], vm='points', vis={personal:true, ruta:false}, lastR=0;
+        const pIco=L.divIcon({html:'<div style="width:14px;height:14px;background:#e94560;border:2px solid #fff;border-radius:50%;box-shadow:0 0 6px rgba(233,69,96,0.7)"></div>',iconSize:[14,14],iconAnchor:[7,7]});
+        const rIco=L.divIcon({html:'<div style="width:16px;height:16px;background:#4caf50;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(76,175,80,0.8)"></div>',iconSize:[16,16],iconAnchor:[8,8]});
+        const api=u=>fetch(u).then(r=>r.json());
+        function clr(){markers.forEach(m=>map.removeLayer(m));markers=[];}
+        function setBtn(id){['b-pts','b-tl'].forEach(b=>document.getElementById(b).classList.remove('active'));document.getElementById(id).classList.add('active');}
+        function tog(n,el){vis[n]=!vis[n];el.classList.toggle('active');render();}
+        function fit(c){if(!c.length)return;c.length===1?map.setView(c[0],16):map.fitBounds(L.latLngBounds(c),{padding:[40,40]});}
+        function getDate(){return document.getElementById('dp').value;}
+        function range(){const s=Math.floor(new Date(getDate()+'T00:00:00').getTime()/1000);return[s,s+86400];}
+
+        async function checkMoto(){
+            const d=await api('/api/moto/status');
+            const bar=document.getElementById('moto-bar'),btn=document.getElementById('btn-moto'),info=document.getElementById('moto-info');
+            if(d.active){bar.className='on';btn.className='on';btn.innerHTML='⏹️ Terminar Ruta';info.innerHTML='<span style="color:#4caf50">● ACTIVO</span> — '+d.points_collected+' puntos';}
+            else{bar.className='';btn.className='off';btn.innerHTML='🏍️ Activar Ruta';info.textContent='Modo ruta: inactivo';}
+        }
+        async function toggleMoto(){
+            const s=await api('/api/moto/status');
+            if(s.active){if(!confirm('¿Terminar ruta?'))return;await api('/api/moto/stop');}
+            else{if(!confirm('¿Activar modo ruta?'))return;await api('/api/moto/start');}
+            checkMoto();render();
+        }
+
+        async function render(){
+            clr(); const all=[]; const [s,e]=range();
+            if(vm==='points'){
+                if(vis.personal){
+                    const d=await api(`/api/locations?start=${s}&end=${e}&limit=10000`);
+                    (d.locations||[]).forEach(l=>{const ll=[l.lat,l.lon];all.push(ll);markers.push(L.marker(ll,{icon:pIco}).addTo(map).bindPopup(`<b>${l.timestamp_local}</b><br>Personal`));});
+                    if((d.locations||[]).length>1) markers.push(L.polyline(d.locations.map(l=>[l.lat,l.lon]),{color:'#e94560',weight:4,opacity:0.8}).addTo(map));
+                }
+                if(vis.ruta){
+                    const d=await api(`/api/locations?start=${s}&end=${e}&tag=ruta&limit=10000`);
+                    (d.locations||[]).forEach(l=>{const ll=[l.lat,l.lon];all.push(ll);markers.push(L.marker(ll,{icon:rIco}).addTo(map).bindPopup(`<b>${l.timestamp_local}</b><br>Ruta`));});
+                    if((d.locations||[]).length>1) markers.push(L.polyline(d.locations.map(l=>[l.lat,l.lon]),{color:'#4caf50',weight:4,opacity:0.8}).addTo(map));
+                }
+            } else {
+                const d=await api(`/api/timeline?date=${getDate()}`);
+                (d.events||[]).forEach(ev=>{
+                    const isR=ev.tag==='ruta';
+                    if(ev.type==='route'){
+                        if((isR&&vis.ruta)||(!isR&&vis.personal)){
+                            const f=[ev.from_lat,ev.from_lon],t=[ev.to_lat,ev.to_lon];all.push(f,t);
+                            markers.push(L.polyline([f,t],{color:'#4caf50',weight:6,opacity:0.8,dashArray:'8,8'}).addTo(map).bindPopup(`🛣️ ${Math.round(ev.km)} km en ${ev.min} min`));
+                        }
+                    } else if(ev.type==='visit'){
+                        if((isR&&vis.ruta)||(!isR&&vis.personal)){
+                            const ll=[ev.lat,ev.lon];all.push(ll);
+                            markers.push(L.circleMarker(ll,{radius:12,fillColor:isR?'#4caf50':'#e94560',color:'#fff',weight:3,fillOpacity:0.8}).addTo(map).bindPopup(`<b>📍 ${isR?'Ruta':'Personal'}</b><br>🕐 ${ev.start} → ${ev.end}<br>⏱️ ${ev.duration_min} min`));
+                        }
+                    }
+                });
+            }
+            fit(all);
+        }
+
+        async function refresh(){
+            const now=Date.now();
+            if(now-lastR<60000){alert('Espera '+Math.ceil((60000-(now-lastR))/1000)+'s');return;}
+            lastR=now; await api('/api/process'); render();
+        }
+
+        document.getElementById('dp').value=new Date().toISOString().split('T')[0];
+        checkMoto(); render();
+    </script>
+</body>
+</html>

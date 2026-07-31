@@ -1,0 +1,15 @@
+[Unit]
+Description=TrackR - Personal Route Tracker (HTTPS)
+After=network.target
+
+[Service]
+Type=simple
+User=admin
+WorkingDirectory=/home/admin/trackr
+ExecStart=/home/admin/trackr/venv/bin/gunicorn -w 2 -b 0.0.0.0:5050 --certfile=/home/admin/trackr/data/cert.pem --keyfile=/home/admin/trackr/data/key.pem app:app
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
