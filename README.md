@@ -63,10 +63,13 @@ GET /    # Mapa web interactivo
 GET /health  # Health check
 ```
 
-## Setup iPhone (OwnTracks)
+## Setup OwnTracks
+
+> **Android**: La configuración es prácticamente idéntica. No ha sido probado formalmente con TrackR, pero OwnTracks en Android usa el mismo protocolo HTTP. La diferencia principal es que en Android necesitas poner la app en "no restringir" en ajustes de batería.
 
 ### 1. Instalar OwnTracks
-- App Store → buscar "OwnTracks" → instalar (gratis)
+- **iOS**: App Store → buscar "OwnTracks" → instalar (gratis)
+- **Android**: Google Play → buscar "OwnTracks" → instalar (gratis)
 
 ### 2. Configurar permisos
 - **Ubicación**: Siempre (no "Al usar la app")
@@ -96,6 +99,29 @@ GET /health  # Health check
 - **Para activar**: Abrir OwnTracks → tocar el botón de modo → "Move" o "Significant"
 - **Para desactivar**: Cambiar modo a "Manual" o cerrar la app
 - **Geofences**: Configurar regiones para automatizaciones (ej: "al llegar a casa, desactivar")
+
+## Certificado SSL (solo iOS con Tailscale)
+
+Si el server está en Tailscale con HTTPS, iOS no acepta certificados autofirmados por defecto. Sigue estos pasos:
+
+### Generar certificado (en el server)
+```bash
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes \
+  -subj "/CN=YOUR_SERVER_IP" \
+  -addext "subjectAltName=IP:YOUR_SERVER_IP"
+```
+
+### Instalar en iPhone
+1. Abrir Safari → `https://YOUR_SERVER_IP:5050/static/trackr-cert.pem`
+2. Ajustes → General → Gestión de dispositivo → Instalar perfil
+3. Ajustes → General → Acerca de → Ajustes de certificados → Activar confianza
+
+### Configurar en OwnTracks
+1. Settings → TLS → Activado
+2. Settings → TLS → Trust untrusted certificates → Activado
+3. URL: `https://YOUR_SERVER_IP:5050/owntracks`
+
+> **Android**: No necesita certificado autofirmado. HTTP funciona directo sin HTTPS.
 
 ## Dashboard
 
