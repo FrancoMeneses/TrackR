@@ -102,7 +102,7 @@ GET /health  # Health check
 ### 6. Activar/Desactivar tracking
 - **Para activar**: Abrir OwnTracks → tocar el botón de modo → "Move" o "Significant"
 - **Para desactivar**: Cambiar modo a "Manual" o cerrar la app
-- **Geofences**: Configurar regiones para automações (ej: "al llegar a casa, desactivar")
+- **Geofences**: Configurar regiones para automatizaciones (ej: "al llegar a casa, desactivar")
 
 ## Dashboard
 
