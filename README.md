@@ -122,7 +122,7 @@ http://YOUR_SERVER_IP:5050/
 
 ## Uso con agentes
 
-El agente Aserrin puede consultar las rutas via API:
+Un agente puede consultar las rutas via API:
 
 ```bash
 # Ver ubicaciones de hoy
@@ -191,7 +191,7 @@ sudo systemctl start trackr
 - [ ] Agregar autenticación al endpoint
 - [ ] HTTPS con Let's Encrypt o certificado auto-firmado
 - [ ] Rate limiting
-- [ ] API key para consultas externas (Aserrin)
+- [ ] API key para consultas externas (agentes)
 
 ---
 
